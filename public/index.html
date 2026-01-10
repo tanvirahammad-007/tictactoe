@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Tic-Tac-Toe - Online Multiplayer</title>
+    <link rel="stylesheet" href="/src/styles.css">
+</head>
+<body>
+    <div class="grid-background"></div>
+    
+    <!-- Audio Element -->
+    <audio id="bgMusic" loop></audio>
+    
+    <div class="container">
+        <!-- Menu Screen -->
+        <div id="menuScreen" class="menu-screen">
+            <div class="game-header">
+                <h1>TIC-TAC-TOE</h1>
+            </div>
+            
+            <div class="menu-buttons">
+                <button class="neon-btn" onclick="showDifficultySelection()">
+                    <span class="icon">👤</span>
+                    <span>VS</span>
+                    <span class="icon">💻</span>
+                </button>
+                <button class="neon-btn" onclick="showNameInput()">
+                    <span class="icon">👤</span>
+                    <span>VS</span>
+                    <span class="icon">👤</span>
+                    <span style="font-size: 0.7em; opacity: 0.8;">(Local)</span>
+                </button>
+                <button class="neon-btn" onclick="showOnlineMenu()">
+                    <span class="icon">🌐</span>
+                    <span>Online Match</span>
+                    <span class="icon">🔗</span>
+                </button>
+                <button class="neon-btn" onclick="showStats()">
+                    <span class="icon">📊</span>
+                    <span>Statistics</span>
+                </button>
+                <button class="neon-btn" onclick="showAbout()">
+                    <span class="icon">ℹ️</span>
+                    <span>About</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Difficulty Screen -->
+        <div id="difficultyScreen" class="menu-screen hidden">
+            <button class="back-btn" onclick="showMenu()">
+                <span class="arrow-icon">←</span>
+            </button>
+            <h2 class="screen-title">Select Difficulty</h2>
+            <input type="text" id="playerNameInput" placeholder="Enter Your Name" class="neon-input">
+            <div class="menu-buttons">
+                <button class="neon-btn" onclick="startGame('computer', 'easy')">😊 Easy</button>
+                <button class="neon-btn" onclick="startGame('computer', 'medium')">😐 Medium</button>
+                <button class="neon-btn" onclick="startGame('computer', 'hard')">😈 Unbeatable</button>
+            </div>
+        </div>
+
+        <!-- Name Input Screen -->
+        <div id="nameInputScreen" class="name-input-screen hidden">
+            <button class="back-btn" onclick="showMenu()">
+                <span class="arrow-icon">←</span>
+            </button>
+            <h2 class="screen-title">Enter Names</h2>
+            <input type="text" id="p1Input" placeholder="Player 1 Name" class="neon-input">
+            <input type="text" id="p2Input" placeholder="Player 2 Name" class="neon-input">
+            <button class="neon-btn" onclick="startGame('2player')">Start Game</button>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="game-screen hidden">
+            <button class="back-btn" onclick="showMenu()">
+                <span class="arrow-icon">←</span>
+            </button>
+
+            <div class="score-display">
+                <div class="player-score">
+                    <div class="symbol-x">✕</div>
+                    <div class="player-name" id="p1NameDisplay">Player one</div>
+                </div>
+                <div class="score-center">
+                    <span id="scoreDisplay">0:0</span>
+                </div>
+                <div class="player-score">
+                    <div class="symbol-o">○</div>
+                    <div class="player-name" id="p2NameDisplay">Player two</div>
+                </div>
+            </div>
+
+            <div class="turn-indicator">
+                <span class="turn-line"></span>
+            </div>
+
+            <div id="board" class="board"></div>
+        </div>
+
+        <!-- Stats Screen -->
+        <div id="statsScreen" class="stats-screen hidden">
+            <button class="back-btn" onclick="showMenu()">
+                <span class="arrow-icon">←</span>
+            </button>
+            <h2 class="screen-title">Statistics</h2>
+            <div class="stats-grid" id="statsGrid"></div>
+            <button class="neon-btn" style="margin: 20px;" onclick="resetStats()">Reset Statistics</button>
+        </div>
+
+        <!-- Settings Screen -->
+        <div id="settingsScreen" class="settings-screen hidden">
+            <button class="back-btn" onclick="backFromSettings()">
+                <span class="arrow-icon">←</span>
+            </button>
+            <h2 class="screen-title">Settings</h2>
+            <div style="padding: 20px;">
+                <div style="margin-bottom: 20px;">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <div id="musicToggle" class="toggle-switch">
+                            <div class="toggle-slider"></div>
+                        </div>
+                        <span>Background Music</span>
+                    </label>
+                </div>
+            </div>
+            <button class="neon-btn" style="margin: 20px;" onclick="showStatsFromSettings()">View Statistics</button>
+        </div>
+
+        <!-- About Screen -->
+        <div id="aboutScreen" class="about-screen hidden">
+            <button class="back-btn" onclick="showMenu()">
+                <span class="arrow-icon">←</span>
+            </button>
+            <h2 class="screen-title">About Game</h2>
+            <div class="about-content">
+                <div class="about-section">
+                    <h3 class="about-subtitle">🎮 How to Play</h3>
+                    <p>Tic-Tac-Toe is a classic game for two players. Players take turns marking spaces in a 3×3 grid with X or O. The first player to get three marks in a row (horizontally, vertically, or diagonally) wins the game!</p>
+                </div>
+                
+                <div class="about-section">
+                    <h3 class="about-subtitle">🎯 Game Modes</h3>
+                    <p><strong>VS Computer:</strong> Play against AI with three difficulty levels - Easy, Medium, and Unbeatable!</p>
+                    <p><strong>VS Player (Local):</strong> Challenge your friends in local multiplayer mode.</p>
+                    <p><strong>Online Match:</strong> Play with friends remotely by sharing a game code!</p>
+                </div>
+                
+                <div class="about-section">
+                    <h3 class="about-subtitle">✨ Features</h3>
+                    <p>• Stunning neon pixel-art design</p>
+                    <p>• Track your wins and statistics</p>
+                    <p>• Fully responsive - play on any device</p>
+                    <p>• Smart AI opponent with minimax algorithm</p>
+                    <p>• Real-time online multiplayer with Firebase</p>
+                </div>
+                
+                <div class="about-footer">
+                    <p>Created by Team Believers✨</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Online Menu Screen -->
+        <div id="onlineMenuScreen" class="menu-screen hidden">
+            <button class="back-btn" onclick="showMenu()">
+                <span class="arrow-icon">←</span>
+            </button>
+            <h2 class="screen-title">Online Match</h2>
+            <div class="menu-buttons">
+                <button class="neon-btn" onclick="showCreateGame()">
+                    <span class="icon">➕</span>
+                    <span>Create Game</span>
+                </button>
+                <button class="neon-btn" onclick="showJoinGame()">
+                    <span class="icon">🔓</span>
+                    <span>Join Game</span>
+                </button>
+            </div>
+            <div class="neon-input" style="margin-top: 20px; padding: 15px; text-align: center; border-style: dashed;">
+                <p style="font-size: 0.9em; margin-bottom: 10px;">How to play online:</p>
+                <p style="font-size: 0.8em; opacity: 0.7;">1. One player creates a game and gets a code</p>
+                <p style="font-size: 0.8em; opacity: 0.7;">2. Share the 6-digit code with your friend</p>
+                <p style="font-size: 0.8em; opacity: 0.7;">3. Friend joins using the code</p>
+            </div>
+        </div>
+
+        <!-- Create Game Screen -->
+        <div id="createGameScreen" class="menu-screen hidden">
+            <button class="back-btn" onclick="showOnlineMenu()">
+                <span class="arrow-icon">←</span>
+            </button>
+            <h2 class="screen-title">Create Game</h2>
+            <input type="text" id="hostNameInput" placeholder="Enter Your Name" class="neon-input">
+            <button class="neon-btn" onclick="createOnlineGame()">Create Game</button>
+            <div id="gameCodeSection" class="game-code-display hidden">
+                <div class="code-label">Your Game Code:</div>
+                <div class="game-code" id="gameCodeDisplay">------</div>
+                <button class="neon-btn small-btn" onclick="copyGameCode()" style="margin-top: 15px;">
+                    <span>📋 Copy Code</span>
+                </button>
+                <div class="waiting-message">
+                    <div class="spinner"></div>
+                    <p>Waiting for opponent to join...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Join Game Screen -->
+        <div id="joinGameScreen" class="menu-screen hidden">
+            <button class="back-btn" onclick="showOnlineMenu()">
+                <span class="arrow-icon">←</span>
+            </button>
+            <h2 class="screen-title">Join Game</h2>
+            <input type="text" id="joinNameInput" placeholder="Enter Your Name" class="neon-input">
+            <input type="text" id="gameCodeInput" placeholder="Enter Game Code" class="neon-input" maxlength="6" style="text-transform: uppercase;">
+            <button class="neon-btn" onclick="joinOnlineGame()">
+                <span class="icon">🚀</span>
+                <span>Join Game</span>
+            </button>
+            <div id="joinError" class="error-message hidden"></div>
+        </div>
+    </div>
+
+    <!-- Win Modal -->
+    <div id="winModal" class="modal-overlay hidden">
+        <div class="win-modal">
+            <div class="winner-symbol" id="winnerSymbol"></div>
+            <div class="winner-text" id="winnerText">Winner!</div>
+            <div class="modal-buttons">
+                <button class="neon-btn" onclick="closeModal()">Play Again</button>
+                <button class="neon-btn" onclick="goHomeFromModal()">🏠 Home</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="/src/index.js"></script>
+</body>
+</html>
