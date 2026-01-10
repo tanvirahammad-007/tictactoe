@@ -13,7 +13,7 @@
 
     <!-- Menu Screen -->
     <div id="menuScreen" class="menu-screen">
-        <h1>TicTacToe</h1>
+        <h1>🎮TicTacToe</h1>
         <button onclick="showDifficultySelection()">🤖 vs Computer</button>
         <button onclick="showNameInput()">👥 2 Players</button>
         <button onclick="showOnlineMenu()">🌐 Play Online</button>
@@ -107,13 +107,40 @@
         <button onclick="backFromSettings()">🔙 Back</button>
     </div>
 
-    <!-- About Screen -->
-    <div id="aboutScreen" class="about-screen hidden">
-        <h1>About</h1>
-        <p>TicTacToe Online - Version 1.0</p>
-        <p>A classic game with online multiplayer!</p>
-        <button onclick="showMenu()">🔙 Back</button>
-    </div>
+          <!-- About Screen -->
+        <div id="aboutScreen" class="about-screen hidden">
+            <button class="back-btn" onclick="showMenu()">
+                <span class="arrow-icon">←</span>
+            </button>
+            <h2 class="screen-title">About Game</h2>
+            <div class="about-content">
+                <div class="about-section">
+                    <h3 class="about-subtitle">🎮 How to Play</h3>
+                    <p>Tic-Tac-Toe is a classic game for two players. Players take turns marking spaces in a 3×3 grid with X or O. The first player to get three marks in a row (horizontally, vertically, or diagonally) wins the game!</p>
+                </div>
+                
+                <div class="about-section">
+                    <h3 class="about-subtitle">🎯 Game Modes</h3>
+                    <p><strong>VS Computer:</strong> Play against AI with three difficulty levels - Easy, Medium, and Unbeatable!</p>
+                    <p><strong>VS Player (Local):</strong> Challenge your friends in local multiplayer mode.</p>
+                    <p><strong>Online Match:</strong> Play with friends remotely by sharing a game code!</p>
+                </div>
+                
+                <div class="about-section">
+                    <h3 class="about-subtitle">✨ Features</h3>
+                    <p>• Stunning neon pixel-art design</p>
+                    <p>• Track your wins and statistics</p>
+                    <p>• Fully responsive - play on any device</p>
+                    <p>• Smart AI opponent with minimax algorithm</p>
+                    <p>• Real-time online multiplayer with Firebase</p>
+                </div>
+                
+                <div class="about-footer">
+                    <p>Created by Team Believers✨</p>
+                </div>
+            </div>
+        </div>
+
 
     <!-- Win Modal -->
     <div id="winModal" class="modal-overlay hidden">
