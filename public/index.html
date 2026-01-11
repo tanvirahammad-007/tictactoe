@@ -8,6 +8,22 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="neon-grid"></div>
+        <div class="floating-symbols">
+            <span class="float-symbol">✕</span>
+            <span class="float-symbol">◯</span>
+            <span class="float-symbol">✕</span>
+            <span class="float-symbol">◯</span>
+            <span class="float-symbol">✕</span>
+            <span class="float-symbol">◯</span>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
     <audio id="bgMusic" loop>
         <source src="background-music.mp3" type="audio/mpeg">
     </audio>
@@ -193,7 +209,18 @@
     
     <!-- Game Logic -->
     <script>
-        // Socket.io connection - UPDATE THIS URL
+        // Toast Notification Function
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + type;
+            
+            setTimeout(() => {
+                toast.className = 'toast';
+            }, 3000);
+        }
+
+        // Socket.io connection
         const BACKEND_URL = 'https://tictactoe-test-p2ok.onrender.com';
         let socket = null;
 
@@ -268,7 +295,7 @@
             });
 
             socket.on('opponentDisconnected', () => {
-                alert('Your opponent has disconnected!');
+                showToast('Your opponent has disconnected!', 'error');
                 showMenu();
             });
 
@@ -296,10 +323,13 @@
             p2Name: 'Player 2',
             isGameOver: false,
             stats: JSON.parse(localStorage.getItem('ttt_stats')) || {
-                total: 0,
-                p1Wins: 0,
-                p2Wins: 0,
-                draws: 0
+                totalGames: 0,
+                computerGames: 0,
+                twoPlayerGames: 0,
+                onlineGames: 0,
+                computerWins: 0,
+                computerLoses: 0,
+                computerDraws: 0
             },
             scores: { p1: 0, p2: 0 },
             musicEnabled: localStorage.getItem('ttt_music') !== 'false',
@@ -319,14 +349,11 @@
 
         // Initialize
         window.addEventListener('load', () => {
-            // Show intro first
             showIntro();
-            
             initMusic();
             setupMusicToggle();
             setupVolumeControl();
             
-            // Auto-play music on first interaction
             document.body.addEventListener('click', () => {
                 if (gameState.musicEnabled) {
                     playMusic();
@@ -339,7 +366,6 @@
             const intro = document.getElementById('introScreen');
             intro.classList.remove('hidden');
             
-            // Hide intro and show menu after 3 seconds
             setTimeout(() => {
                 intro.classList.add('fade-out');
                 setTimeout(() => {
@@ -420,7 +446,6 @@
             hideAll();
             gameState.fromGame = false;
             
-            // Clear input fields
             document.getElementById('p1Input').value = '';
             document.getElementById('p2Input').value = '';
             document.getElementById('hostNameInput').value = '';
@@ -442,7 +467,6 @@
 
         function showNameInput() {
             hideAll();
-            // Clear input fields when showing
             document.getElementById('p1Input').value = '';
             document.getElementById('p2Input').value = '';
             document.getElementById('nameInputScreen').classList.remove('hidden');
@@ -485,7 +509,6 @@
 
         function showOnlineMenu() {
             hideAll();
-            // Clear input fields
             document.getElementById('hostNameInput').value = '';
             document.getElementById('joinNameInput').value = '';
             document.getElementById('gameCodeInput').value = '';
@@ -494,7 +517,6 @@
 
         function showCreateGame() {
             hideAll();
-            // Clear input field
             document.getElementById('hostNameInput').value = '';
             document.getElementById('createGameScreen').classList.remove('hidden');
             document.getElementById('gameCodeSection').classList.add('hidden');
@@ -502,7 +524,6 @@
 
         function showJoinGame() {
             hideAll();
-            // Clear input fields
             document.getElementById('joinNameInput').value = '';
             document.getElementById('gameCodeInput').value = '';
             document.getElementById('joinGameScreen').classList.remove('hidden');
@@ -534,7 +555,6 @@
                 turnSymbol.style.color = gameState.currentPlayer === 'X' ? '#ff6b9d' : '#00d9ff';
             }
             
-            // Add animation
             turnDisplay.style.animation = 'none';
             setTimeout(() => {
                 turnDisplay.style.animation = 'turnPulse 0.5s ease';
@@ -638,24 +658,47 @@
 
         function endGame(result, winCombo = null) {
             gameState.isGameOver = true;
-            gameState.stats.total++;
+            gameState.stats.totalGames++;
 
-            if (result === 'draw') {
-                gameState.stats.draws++;
-                showWinModal('Draw!', '🤝');
-            } else {
+            // Track game mode
+            if (gameState.gameMode === 'computer') {
+                gameState.stats.computerGames++;
+                
+                if (result === 'draw') {
+                    gameState.stats.computerDraws++;
+                } else if (result === 'X') {
+                    // Player wins against computer
+                    gameState.stats.computerWins++;
+                    gameState.scores.p1++;
+                } else {
+                    // Computer wins (player loses)
+                    gameState.stats.computerLoses++;
+                    gameState.scores.p2++;
+                }
+            } else if (gameState.gameMode === 'twoPlayer') {
+                gameState.stats.twoPlayerGames++;
+                
                 if (result === 'X') {
                     gameState.scores.p1++;
-                    gameState.stats.p1Wins++;
-                } else {
+                } else if (result === 'O') {
                     gameState.scores.p2++;
-                    gameState.stats.p2Wins++;
                 }
+            } else if (gameState.gameMode === 'online') {
+                gameState.stats.onlineGames++;
+                
+                if (result === 'X') {
+                    gameState.scores.p1++;
+                } else if (result === 'O') {
+                    gameState.scores.p2++;
+                }
+            }
 
+            if (result === 'draw') {
+                showWinModal('Draw!', '🤝');
+            } else {
                 const winnerName = result === 'X' ? gameState.p1Name : gameState.p2Name;
                 const symbol = result === 'X' ? '✕' : '◯';
                 const color = result === 'X' ? '#ff6b9d' : '#00d9ff';
-
                 showWinModal(winnerName, symbol, color);
             }
 
@@ -695,32 +738,67 @@
         function showStats() {
             hideAll();
             const s = gameState.stats;
+            
+            // Calculate computer win percentage
+            // Win rate = Wins / (Wins + Loses) * 100
+            const totalComputerGamesPlayed = s.computerWins + s.computerLoses;
+            const computerWinPercentage = totalComputerGamesPlayed > 0 
+                ? ((s.computerWins / totalComputerGamesPlayed) * 100).toFixed(1) 
+                : 'Null';
+            
+            // Helper function to display stat or "Null"
+            const displayStat = (value) => value > 0 ? value : 'Null';
+            
             document.getElementById('statsGrid').innerHTML = `
                 <div class="stat-card">
-                    <h3>Total Games</h3>
-                    <p>${s.total}</p>
+                    <h3>Total Games Played</h3>
+                    <p>${displayStat(s.totalGames)}</p>
                 </div>
                 <div class="stat-card">
-                    <h3>Player 1 Wins</h3>
-                    <p>${s.p1Wins}</p>
+                    <h3>Played With Computer</h3>
+                    <p>${displayStat(s.computerGames)}</p>
                 </div>
                 <div class="stat-card">
-                    <h3>Player 2 Wins</h3>
-                    <p>${s.p2Wins}</p>
+                    <h3>2 Player Mode</h3>
+                    <p>${displayStat(s.twoPlayerGames)}</p>
                 </div>
                 <div class="stat-card">
-                    <h3>Draws</h3>
-                    <p>${s.draws}</p>
+                    <h3>Online Games</h3>
+                    <p>${displayStat(s.onlineGames)}</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Wins vs Computer</h3>
+                    <p>${displayStat(s.computerWins)}</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Draws vs Computer</h3>
+                    <p>${displayStat(s.computerDraws)}</p>
+                </div>
+                <div class="stat-card stat-card-wide">
+                    <h3>Win Rate vs Computer</h3>
+                    <p>${computerWinPercentage}${typeof computerWinPercentage === 'number' || computerWinPercentage !== 'Null' ? '%' : ''}</p>
                 </div>
             `;
             document.getElementById('statsScreen').classList.remove('hidden');
         }
 
         function resetStats() {
-            if (confirm("Reset all statistics?")) {
-                gameState.stats = { total: 0, p1Wins: 0, p2Wins: 0, draws: 0 };
+            // Show confirmation modal using custom styled notification
+            const confirmReset = confirm("Are you sure you want to reset all statistics? This action cannot be undone.");
+            
+            if (confirmReset) {
+                gameState.stats = { 
+                    totalGames: 0,
+                    computerGames: 0,
+                    twoPlayerGames: 0,
+                    onlineGames: 0,
+                    computerWins: 0,
+                    computerLoses: 0,
+                    computerDraws: 0
+                };
                 localStorage.setItem('ttt_stats', JSON.stringify(gameState.stats));
                 showStats();
+                showToast('✅ Statistics reset successfully!', 'success');
             }
         }
 
@@ -728,7 +806,7 @@
         function createOnlineGame() {
             const hostName = document.getElementById('hostNameInput').value.trim();
             if (!hostName) {
-                alert('Please enter your name!');
+                showToast('Please enter your name!', 'error');
                 return;
             }
 
@@ -744,9 +822,9 @@
         function copyGameCode() {
             const code = gameState.gameCode;
             navigator.clipboard.writeText(code).then(() => {
-                alert(`Code ${code} copied!`);
+                showToast(`Code ${code} copied!`, 'success');
             }).catch(() => {
-                alert(`Game code: ${code}`);
+                showToast(`Game code: ${code}`, 'info');
             });
         }
 
@@ -755,7 +833,7 @@
             const code = document.getElementById('gameCodeInput').value.trim().toUpperCase();
 
             if (!guestName || !code) {
-                alert('Please enter your name and game code!');
+                showToast('Please enter your name and game code!', 'error');
                 return;
             }
 
