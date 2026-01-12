@@ -47,6 +47,7 @@ A modern **neon-styled Tic-Tac-Toe game** with **AI modes, local play, and real-
 * **JavaScript (ES6+)**
 * **Firebase Realtime Database**
 * **Netlify** (Deployment & Hosting)
+* **Render** (Backend Hosting)
 
 ---
 
