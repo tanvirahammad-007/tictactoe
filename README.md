@@ -36,7 +36,7 @@ A modern **neon-styled Tic-Tac-Toe game** with **AI modes, local play, and real-
 ## 🚀 Live Demo
 
 🔗 **Play Now:**
-👉 [https://tictactoe-test128.netlify.app/](https://tictactoe-test128.netlify.app/)
+👉 [https://tictactoe-test128.netlify.app/](https://team-believers.netlify.app/)
 
 ---
 
